@@ -15,6 +15,9 @@ class NRService:
     def planned_arrival(self):
         return self.__format_time_to_datetime__(self.raw['std'])
 
+    def platform(self):
+        return self.raw['platform']
+
     def estimated_arrival(self):
         if (self.raw['etd'] == 'On time'):
             return self.__format_time_to_datetime__(self.raw['std'])
@@ -24,11 +27,12 @@ class NRService:
             return self.__format_time_to_datetime__(self.raw['etd'])
 
     def status(self):
-        if (self.raw['etd'] == 'On time' or self.raw['etd'] == 'Cancelled'
-                or self.raw['etd'] == 'Delayed'):
+        if (self.raw['etd'] == 'Cancelled' or self.raw['etd'] == 'Delayed'):
             return self.raw['etd']
         elif (datetime.now() > self.estimated_arrival()):
             return 'Overdue'
+        if (self.raw['etd'] == 'On time'):
+            return self.raw['etd']
         else:
             return 'Late'
 
@@ -37,11 +41,9 @@ class NRService:
                 or self.raw['etd'] == 'Delayed'):
             return None
         else:
-            delay_minutes = math.ceil(
+            return math.ceil(
                 (self.estimated_arrival() - self.planned_arrival()).seconds /
                 60)
-
-            return '{} minutes'.format(delay_minutes)
 
     def length(self):
         return str(self.raw['length'])
@@ -54,10 +56,8 @@ class NRService:
         elif (time_now > self.estimated_arrival()):
             return None
         else:
-            diff_minutes = math.ceil(
+            return math.ceil(
                 (self.estimated_arrival() - time_now).seconds / 60)
-
-            return '{} minutes'.format(diff_minutes)
 
     # Private
 
